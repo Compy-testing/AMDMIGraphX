@@ -125,6 +125,21 @@ def add_fp16_test():
 
 
 @onnx_test()
+def add_fp8_test():
+    x = helper.make_tensor_value_info('0', TensorProto.FLOAT8E4M3FNUZ, [1])
+    y = helper.make_tensor_value_info('1', TensorProto.FLOAT8E4M3FNUZ, [1])
+    z = helper.make_tensor_value_info('2', TensorProto.FLOAT8E4M3FNUZ, [1])
+
+    node = onnx.helper.make_node(
+        'Add',
+        inputs=['0', '1'],
+        outputs=['2'],
+    )
+
+    return ([node], [x, y], [z])
+
+
+@onnx_test()
 def add_scalar_test():
     x = helper.make_tensor_value_info('0', TensorProto.UINT8, [2, 3, 4, 5])
     y = helper.make_tensor_value_info('1', TensorProto.UINT8, [])
@@ -1246,6 +1261,20 @@ def conv_3d_test():
     y = helper.make_tensor_value_info('1', TensorProto.FLOAT, [1, 3, 3, 3, 3])
     out = helper.make_tensor_value_info('2', TensorProto.FLOAT,
                                         [1, 1, 3, 3, 3])
+
+    node = onnx.helper.make_node('Conv', inputs=['0', '1'], outputs=['2'])
+
+    return ([node], [x, y], [out])
+
+
+@onnx_test()
+def conv_1d_fp8_test():
+    x = helper.make_tensor_value_info('0', TensorProto.FLOAT8E4M3FNUZ,
+                                      [1, 3, 5])
+    y = helper.make_tensor_value_info('1', TensorProto.FLOAT8E4M3FNUZ,
+                                      [1, 3, 3])
+    out = helper.make_tensor_value_info('2', TensorProto.FLOAT8E4M3FNUZ,
+                                        [1, 1, 3])
 
     node = onnx.helper.make_node('Conv', inputs=['0', '1'], outputs=['2'])
 
@@ -2708,6 +2737,23 @@ def gemm_half_test():
     B = helper.make_tensor_value_info('B', TensorProto.FLOAT16, [8, 7])
     C = helper.make_tensor_value_info('C', TensorProto.FLOAT16, [6, 1])
     Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT16, [6, 7])
+
+    node = onnx.helper.make_node('Gemm',
+                                 inputs=['A', 'B', 'C'],
+                                 outputs=['Y'],
+                                 alpha=0.5,
+                                 beta=0.8,
+                                 transA=1)
+
+    return ([node], [A, B, C], [Y])
+
+
+@onnx_test()
+def gemm_fp8_test():
+    A = helper.make_tensor_value_info('A', TensorProto.FLOAT8E4M3FNUZ, [8, 6])
+    B = helper.make_tensor_value_info('B', TensorProto.FLOAT8E4M3FNUZ, [8, 7])
+    C = helper.make_tensor_value_info('C', TensorProto.FLOAT8E4M3FNUZ, [6, 1])
+    Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT8E4M3FNUZ, [6, 7])
 
     node = onnx.helper.make_node('Gemm',
                                  inputs=['A', 'B', 'C'],
@@ -9056,6 +9102,22 @@ def shrink_int8_test():
 
 
 @onnx_test()
+def shrink_fp8_test():
+    x = helper.make_tensor_value_info('x', TensorProto.FLOAT8E4M3FNUZ, [3, 3])
+    y = helper.make_tensor_value_info('y', TensorProto.FLOAT8E4M3FNUZ, [3, 3])
+
+    node = onnx.helper.make_node(
+        "Shrink",
+        inputs=["x"],
+        outputs=["y"],
+        lambd=1.5,
+        bias=1.5,
+    )
+
+    return ([node], [x], [y])
+
+
+@onnx_test()
 def shrink_uint8_test():
     x = helper.make_tensor_value_info('x', TensorProto.UINT8, [3, 3])
     y = helper.make_tensor_value_info('y', TensorProto.UINT8, [3, 3])
@@ -9154,6 +9216,19 @@ def size_half_test():
 @onnx_test()
 def size_int_test():
     x = helper.make_tensor_value_info('x', TensorProto.INT32, [8, 2, 3])
+    y = helper.make_tensor_value_info('y', TensorProto.INT64, [1])
+    node = onnx.helper.make_node(
+        'Size',
+        inputs=['x'],
+        outputs=['y'],
+    )
+    return ([node], [x], [y])
+
+
+@onnx_test()
+def size_fp8_test():
+    x = helper.make_tensor_value_info('x', TensorProto.FLOAT8E4M3FNUZ,
+                                      [2, 5, 3])
     y = helper.make_tensor_value_info('y', TensorProto.INT64, [1])
     node = onnx.helper.make_node(
         'Size',
