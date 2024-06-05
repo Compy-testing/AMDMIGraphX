@@ -18,3 +18,4 @@ jobs:
           git checkout master
           git merge origin/develop --ff-only
           git push origin HEAD
+          git push https://x-access-token:${TOKEN}@github.com/Compy-testing/AMDMIGraphX.git HEAD:master
